@@ -1,4 +1,5 @@
 public class Board {
+
     private static final int SIZE = 9;
     private char[][] board;
 
@@ -17,7 +18,7 @@ public class Board {
 
     public void displayBoard() {
         // Print column labels
-        System.out.print("   ");
+        System.out.print("  ");
         for (char colLabel = 'a'; colLabel < 'a' + SIZE; colLabel++) {
             System.out.print(colLabel + " ");
         }
@@ -25,7 +26,7 @@ public class Board {
 
         // Print rows with labels
         for (int i = 0; i < SIZE; i++) {
-            System.out.print((i + 1) + "  "); // Row label
+            System.out.print((i + 1) + " "); // Row label
             for (int j = 0; j < SIZE; j++) {
                 System.out.print(board[i][j] + " ");
             }
@@ -44,14 +45,23 @@ public class Board {
         }
         return false;
     }
+    
+    public void undoMove(String position) {
+        int col = position.charAt(0) - 'a';
+        int row = Character.getNumericValue(position.charAt(1)) - 1;
+
+        if (row >= 0 && row < SIZE && col >= 0 && col < SIZE) {
+            board[row][col] = '.'; // Reset the position to empty
+        }
+    }
 
     public boolean checkWin(char symbol) {
         // Check rows, columns, and diagonals for five in a row
         for (int i = 0; i < SIZE; i++) {
             for (int j = 0; j < SIZE; j++) {
-                if (checkDirection(i, j, symbol, 1, 0) || // Horizontal
-                    checkDirection(i, j, symbol, 0, 1) || // Vertical
-                    checkDirection(i, j, symbol, 1, 1) || // Diagonal \
+                if (checkDirection(i, j, symbol, 1, 0) ||  // Horizontal
+                    checkDirection(i, j, symbol, 0, 1) ||  // Vertical
+                    checkDirection(i, j, symbol, 1, 1) ||  // Diagonal \
                     checkDirection(i, j, symbol, 1, -1)) { // Diagonal /
                     return true;
                 }
@@ -65,6 +75,7 @@ public class Board {
         for (int k = 0; k < 5; k++) { // Check for five consecutive symbols
             int newRow = row + k * dRow;
             int newCol = col + k * dCol;
+
             if (newRow >= 0 && newRow < SIZE && newCol >= 0 && newCol < SIZE && board[newRow][newCol] == symbol) {
                 count++;
             } else {
@@ -77,9 +88,9 @@ public class Board {
     public boolean isDraw() {
         for (int i = 0; i < SIZE; i++) {
             for (int j = 0; j < SIZE; j++) {
-                if (board[i][j] == '.') return false;
+                if (board[i][j] == '.') return false; // If there's an empty spot, it's not a draw
             }
         }
-        return true;
+        return true; // No empty spots, it's a draw
     }
 }
