@@ -3,9 +3,9 @@ public class Player {
     private String name;
     private char symbol;
 
-    public Player(String name, char symbol) {
+    public Player(String name, char sym) {
         this.name = name;
-        this.symbol = symbol;
+        this.symbol = sym;
     }
 
     public String getName() {

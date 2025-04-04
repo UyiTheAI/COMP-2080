@@ -1,17 +1,17 @@
 public class Board {
 
-    static final int SIZE = 9;
+    static final int size = 9;
     public char[][] board;
 
 
     public Board() {
-        board = new char[SIZE][SIZE];
+        board = new char[size][size];
         initializeBoard();
     }
 
     public void initializeBoard() {
-        for (int i = 0; i < SIZE; i++) {
-            for (int j = 0; j < SIZE; j++) {
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
                 board[i][j] = '.';
             }
         }
@@ -19,52 +19,48 @@ public class Board {
 
 
     public void displayBoard() {
-        // Print column labels
         System.out.print("  ");
-        for (char colLabel = 'a'; colLabel < 'a' + SIZE; colLabel++) {
+        for (char colLabel = 'a'; colLabel < 'a' + size; colLabel++) {
             System.out.print(colLabel + " ");
         }
         System.out.println();
 
-        // Print rows with labels
-        for (int i = 0; i < SIZE; i++) {
-            System.out.print((i + 1) + " "); // Row label
-            for (int j = 0; j < SIZE; j++) {
+        for (int i = 0; i < size; i++) {
+            System.out.print((i + 1) + " "); 
+            for (int j = 0; j < size; j++) {
                 System.out.print(board[i][j] + " ");
             }
             System.out.println();
         }
     }
 
-    public boolean makeMove(String position, char symbol) {
-        // Parse position (e.g., "e5")
-        int col = position.charAt(0) - 'a'; // Convert column letter to index
-        int row = Character.getNumericValue(position.charAt(1)) - 1; // Convert row number to index
+    public boolean makeMove(String position, char sym) {
+        int col = position.charAt(0) - 'a';
+        int row = Character.getNumericValue(position.charAt(1)) - 1;
 
-        if (row >= 0 && row < SIZE && col >= 0 && col < SIZE && board[row][col] == '.') {
-            board[row][col] = symbol;
+        if (row >= 0 && row < size && col >= 0 && col < size && board[row][col] == '.') {
+            board[row][col] = sym;
             return true;
         }
         return false;
     }
     
-    public void undoMove(String position) {
+    public void unmakeMove(String position) {
         int col = position.charAt(0) - 'a';
         int row = Character.getNumericValue(position.charAt(1)) - 1;
 
-        if (row >= 0 && row < SIZE && col >= 0 && col < SIZE) {
-            board[row][col] = '.'; // Reset the position to empty
+        if (row >= 0 && row < size && col >= 0 && col < size) {
+            board[row][col] = '.'; 
         }
     }
 
-    public boolean checkWin(char symbol) {
-        // Check rows, columns, and diagonals for five in a row
-        for (int i = 0; i < SIZE; i++) {
-            for (int j = 0; j < SIZE; j++) {
-                if (checkDirection(i, j, symbol, 1, 0) ||  // Horizontal
-                    checkDirection(i, j, symbol, 0, 1) ||  // Vertical
-                    checkDirection(i, j, symbol, 1, 1) ||  // Diagonal \
-                    checkDirection(i, j, symbol, 1, -1)) { // Diagonal /
+    public boolean checkWin(char sym) {
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
+                if (checkDirection(i, j, sym, 1, 0) ||
+                    checkDirection(i, j, sym, 0, 1) || 
+                    checkDirection(i, j, sym, 1, 1) ||
+                    checkDirection(i, j, sym, 1, -1)) {
                     return true;
                 }
             }
@@ -72,13 +68,13 @@ public class Board {
         return false;
     }
 
-    private boolean checkDirection(int row, int col, char symbol, int dRow, int dCol) {
+    private boolean checkDirection(int row, int col, char sym, int dRow, int dCol) {
         int count = 0;
-        for (int k = 0; k < 5; k++) { // Check for five consecutive symbols
+        for (int k = 0; k < 5; k++) { 
             int newRow = row + k * dRow;
             int newCol = col + k * dCol;
 
-            if (newRow >= 0 && newRow < SIZE && newCol >= 0 && newCol < SIZE && board[newRow][newCol] == symbol) {
+            if (newRow >= 0 && newRow < size && newCol >= 0 && newCol < size && board[newRow][newCol] == sym) {
                 count++;
             } else {
                 break;
@@ -88,12 +84,12 @@ public class Board {
     }
 
     public boolean isDraw() {
-        for (int i = 0; i < SIZE; i++) {
-            for (int j = 0; j < SIZE; j++) {
-                if (board[i][j] == '.') return false; // If there's an empty spot, it's not a draw
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
+                if (board[i][j] == '.') return false;
             }
         }
-        return true; // No empty spots, it's a draw
+        return true; 
     }
 
 }

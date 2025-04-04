@@ -10,7 +10,11 @@ public class Gomoku {
 
         System.out.println("Welcome to Gomoku!");
 
-        System.out.println("Choose game mode: \n1) Single Player (vs AI)\n2) Two Players");
+        System.out.println("===============================");
+        System.out.println("Choose game mode:" + 
+        "\n1) Single Player (vs AI)" + 
+        "\n2) Two Players" + 
+        "\n===============================");
 
         int mode = scanner.nextInt();
 
@@ -29,24 +33,27 @@ public class Gomoku {
         System.out.print("Enter your name: ");
         String playerName = scanner.nextLine();
         System.out.print("Choose your symbol ('B' for Black or 'W' for White): ");
-        char playerSymbol = scanner.nextLine().toUpperCase().charAt(0);
+        char playerSym = scanner.nextLine().toUpperCase().charAt(0);
 
-        if (playerSymbol != 'B' && playerSymbol != 'W') {
+
+        if (playerSym != 'B' && playerSym != 'W') {
             System.out.println("Invalid symbol. Defaulting to 'B'.");
-            playerSymbol = 'B';
+            playerSym = 'B';
         }
 
-        char aiSymbol = (playerSymbol == 'B') ? 'W' : 'B';
-        Player player = new Player(playerName, playerSymbol);
+        char aiSymbol = (playerSym == 'B') ? 'W' : 'B';
+        Player player = new Player(playerName, playerSym);
         Player aiPlayer = new Player("AI", aiSymbol);
-        boolean isPlayerTurn = playerSymbol == 'B'; // Black goes first
+        boolean PlayerTurn = playerSym == 'B'; 
 
         while (true) {
             board.displayBoard();
-            Player currentPlayer = isPlayerTurn ? player : aiPlayer;
+            Player currentPlayer = PlayerTurn ? player : aiPlayer;
+            System.out.println("=========================");
             System.out.println(currentPlayer.getName() + "'s turn (" + currentPlayer.getSymbol() + ")");
+            System.out.println("=========================");
 
-            if (isPlayerTurn) {
+            if (PlayerTurn) {
                 System.out.print("Enter your move (e.g., 'e5'): ");
                 String move = scanner.nextLine();
                 if (!board.makeMove(move, player.getSymbol())) {
@@ -55,7 +62,7 @@ public class Gomoku {
                 }
             } else {
                 System.out.println("AI is thinking...");
-                String aiMove = minimax(board, aiSymbol, playerSymbol, 3);
+                String aiMove = minimax(board, aiSymbol, playerSym, 3);
                 if (!board.makeMove(aiMove, aiSymbol)) {
                     System.out.println("AI failed to make a valid move. This should not happen.");
                     break; 
@@ -77,31 +84,35 @@ public class Gomoku {
                 break;
             }
 
-            isPlayerTurn = !isPlayerTurn;
+            PlayerTurn = !PlayerTurn;
         }
     }
 
     private static void twoPlayerMode(Scanner scanner, Board board) {
+        System.out.println("===============================");
         System.out.print("Enter Player 1 name: ");
         String player1Name = scanner.nextLine();
         System.out.print("Choose Player 1 symbol ('B' for Black or 'W' for White): ");
-        char player1Symbol = scanner.nextLine().toUpperCase().charAt(0);
-        if (player1Symbol != 'B' && player1Symbol != 'W') {
+        char player1Sym = scanner.nextLine().toUpperCase().charAt(0);
+        if (player1Sym != 'B' && player1Sym != 'W') {
             System.out.println("Invalid symbol. Defaulting to 'B'.");
-            player1Symbol = 'B';
+            player1Sym = 'B';
         }
 
+        System.out.println("===============================");
         System.out.print("Enter Player 2 name: ");
         String player2Name = scanner.nextLine();
-        char player2Symbol = (player1Symbol == 'B') ? 'W' : 'B';
-        Player player1 = new Player(player1Name, player1Symbol);
-        Player player2 = new Player(player2Name, player2Symbol);
-        boolean isPlayer1Turn = true;
+        char player2Sym = (player1Sym == 'B') ? 'W' : 'B';
+        Player player1 = new Player(player1Name, player1Sym);
+        Player player2 = new Player(player2Name, player2Sym);
+        boolean Player1Turn = true;
 
         while (true) {
             board.displayBoard();
-            Player currentPlayer = isPlayer1Turn ? player1 : player2;
+            Player currentPlayer = Player1Turn ? player1 : player2;
+            System.out.println("===============================");
             System.out.println(currentPlayer.getName() + "'s turn (" + currentPlayer.getSymbol() + ")");
+            System.out.println("===============================");
             System.out.print("Enter your move (e.g., 'e5'): ");
             String move = scanner.nextLine();
             if (!board.makeMove(move, currentPlayer.getSymbol())) {
@@ -123,21 +134,21 @@ public class Gomoku {
                 break;
             }
 
-            isPlayer1Turn = !isPlayer1Turn;
+            Player1Turn = !Player1Turn;
         }
     }
     
-    private static String minimax(Board board, char aiSymbol, char playerSymbol, int depth) {
+    private static String minimax(Board board, char aiSym, char playerSym, int depth) {
         int bestScore = Integer.MIN_VALUE;
         String bestMove = null;
     
-        for (int row = 0; row < Board.SIZE; row++) {
-            for (int col = 0; col < Board.SIZE; col++) {
+        for (int row = 0; row < Board.size; row++) {
+            for (int col = 0; col < Board.size; col++) {
                 if (board.board[row][col] == '.') {
                     String move = (char) ('a' + col) + Integer.toString(row + 1);
-                    board.makeMove(move, aiSymbol);
-                    int score = minimaxRecursive(board, depth - 1, false, aiSymbol, playerSymbol, Integer.MIN_VALUE, Integer.MAX_VALUE);
-                    board.undoMove(move);
+                    board.makeMove(move, aiSym);
+                    int score = minimaxPruning(board, depth - 1, false, aiSym, playerSym, Integer.MIN_VALUE, Integer.MAX_VALUE);
+                    board.unmakeMove(move);
     
                     if (score > bestScore) {
                         bestScore = score;
@@ -149,20 +160,20 @@ public class Gomoku {
         return bestMove;
     }
     
-    private static int minimaxRecursive(Board board, int depth, boolean isMaximizing, char aiSymbol, char playerSymbol, int alpha, int beta) {
-        if (board.checkWin(aiSymbol)) return 10;
-        if (board.checkWin(playerSymbol)) return -10;
-        if (board.isDraw() || depth == 0) return evaluateBoard(board, aiSymbol, playerSymbol);
+    private static int minimaxPruning(Board board, int depth, boolean isMaximizing, char aiSym, char playerSym, int alpha, int beta) {
+        if (board.checkWin(aiSym)) return 10;
+        if (board.checkWin(playerSym)) return -10;
+        if (board.isDraw() || depth == 0) return evaluateBoard(board, aiSym, playerSym);
     
         if (isMaximizing) {
             int maxEval = Integer.MIN_VALUE;
-            for (int row = 0; row < Board.SIZE; row++) {
-                for (int col = 0; col < Board.SIZE; col++) {
+            for (int row = 0; row < Board.size; row++) {
+                for (int col = 0; col < Board.size; col++) {
                     if (board.board[row][col] == '.') {
                         String move = (char) ('a' + col) + Integer.toString(row + 1);
-                        board.makeMove(move, aiSymbol);
-                        int eval = minimaxRecursive(board, depth - 1, false, aiSymbol, playerSymbol, alpha, beta);
-                        board.undoMove(move);
+                        board.makeMove(move, aiSym);
+                        int eval = minimaxPruning(board, depth - 1, false, aiSym, playerSym, alpha, beta);
+                        board.unmakeMove(move);
                         maxEval = Math.max(maxEval, eval);
                         alpha = Math.max(alpha, eval);
                         if (beta <= alpha) return maxEval;
@@ -172,13 +183,13 @@ public class Gomoku {
             return maxEval;
         } else {
             int minEval = Integer.MAX_VALUE;
-            for (int row = 0; row < Board.SIZE; row++) {
-                for (int col = 0; col < Board.SIZE; col++) {
+            for (int row = 0; row < Board.size; row++) {
+                for (int col = 0; col < Board.size; col++) {
                     if (board.board[row][col] == '.') {
                         String move = (char) ('a' + col) + Integer.toString(row + 1);
-                        board.makeMove(move, playerSymbol);
-                        int eval = minimaxRecursive(board, depth - 1, true, aiSymbol, playerSymbol, alpha, beta);
-                        board.undoMove(move);
+                        board.makeMove(move, playerSym);
+                        int eval = minimaxPruning(board, depth - 1, true, aiSym, playerSym, alpha, beta);
+                        board.unmakeMove(move);
                         minEval = Math.min(minEval, eval);
                         beta = Math.min(beta, eval);
                         if (beta <= alpha) return minEval;
@@ -190,54 +201,51 @@ public class Gomoku {
     }
     
     
-    private static int evaluateBoard(Board board, char aiSymbol, char playerSymbol) {
-        int aiScore = evaluateSymbol(board, aiSymbol);
-        int playerScore = evaluateSymbol(board, playerSymbol);
+    private static int evaluateBoard(Board board, char aiSym, char playerSym) {
+        int aiScore = evaluateSymbol(board, aiSym);
+        int playerScore = evaluateSymbol(board, playerSym);
         return aiScore - playerScore;
     }
-    private static int evaluateSymbol(Board board, char symbol) {
+    private static int evaluateSymbol(Board board, char sym) {
         int score = 0;
     
         int[][] directions = {
-            {1, 0},  // Horizontal
-            {0, 1},  // Vertical
-            {1, 1},  // Diagonal \
-            {1, -1}  // Diagonal /
+            {1, 0},
+            {0, 1},
+            {1, 1}, 
+            {1, -1}  
         };
     
         char[][] b = board.board;
     
-        for (int row = 0; row < Board.SIZE; row++) {
-            for (int col = 0; col < Board.SIZE; col++) {
-                if (b[row][col] == symbol) {
+        for (int row = 0; row < Board.size; row++) {
+            for (int col = 0; col < Board.size; col++) {
+                if (b[row][col] == sym) {
                     for (int[] dir : directions) {
                         int count = 1;
                         int openEnds = 0;
     
                         int r = row + dir[0];
                         int c = col + dir[1];
-                        while (r >= 0 && r < Board.SIZE && c >= 0 && c < Board.SIZE && b[r][c] == symbol) {
+                        while (r >= 0 && r < Board.size && c >= 0 && c < Board.size && b[r][c] == sym) {
                             count++;
                             r += dir[0];
                             c += dir[1];
                         }
     
-                        // Check one end
-                        if (r >= 0 && r < Board.SIZE && c >= 0 && c < Board.SIZE && b[r][c] == '.') {
+                        if (r >= 0 && r < Board.size && c >= 0 && c < Board.size && b[r][c] == '.') {
                             openEnds++;
                         }
     
-                        // Go backward
                         r = row - dir[0];
                         c = col - dir[1];
-                        while (r >= 0 && r < Board.SIZE && c >= 0 && c < Board.SIZE && b[r][c] == symbol) {
+                        while (r >= 0 && r < Board.size && c >= 0 && c < Board.size && b[r][c] == sym) {
                             count++;
                             r -= dir[0];
                             c -= dir[1];
                         }
     
-                        // Check the other end
-                        if (r >= 0 && r < Board.SIZE && c >= 0 && c < Board.SIZE && b[r][c] == '.') {
+                        if (r >= 0 && r < Board.size && c >= 0 && c < Board.size && b[r][c] == '.') {
                             openEnds++;
                         }
     
