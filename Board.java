@@ -1,7 +1,8 @@
 public class Board {
 
-    private static final int SIZE = 9;
-    private char[][] board;
+    static final int SIZE = 9;
+    public char[][] board;
+
 
     public Board() {
         board = new char[SIZE][SIZE];
@@ -15,6 +16,7 @@ public class Board {
             }
         }
     }
+
 
     public void displayBoard() {
         // Print column labels
@@ -93,4 +95,5 @@ public class Board {
         }
         return true; // No empty spots, it's a draw
     }
+
 }
