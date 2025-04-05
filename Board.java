@@ -78,7 +78,7 @@ public class Board {
             int newRow = row + k * dRow;
             int newCol = col + k * dCol;
 
-            if (newRow >= 0 && newRow < SIZE && newCol >= 0 && newCol < SIZE && board[newRow][newCol] == sym) {
+            if (newRow >= 0 && newRow < SIZE && newCol >= 0 && newCol < SIZE && board[newRow][newCol] == symbol) {
                 count++;
             } else {
                 break;
