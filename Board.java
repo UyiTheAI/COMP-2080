@@ -5,72 +5,65 @@
  * Judene Brown - 101503637
  * Omoruyi Oredia - 101496942
  */
+import java.util.ArrayList;
+import java.util.List;
 public class Board {
-    static final int size = 9;
+
+    public static final int SIZE = 9;
     public char[][] board;
 
     // Constructor initializes the board
     public Board() {
-        board = new char[size][size];
+        board = new char[SIZE][SIZE];
         initializeBoard();
     }
 
     // Fill the board with '.' to indicate empty cells
     public void initializeBoard() {
-        for (int i = 0; i < size; i++) {
-            for (int j = 0; j < size; j++) {
+        for (int i = 0; i < SIZE; i++) {
+            for (int j = 0; j < SIZE; j++) {
                 board[i][j] = '.';
             }
         }
     }
 
     // Displays the board with row numbers and column letters
+
     public void displayBoard() {
         System.out.print("  ");
-        for (char colLabel = 'a'; colLabel < 'a' + size; colLabel++) {
+        for (char colLabel = 'a'; colLabel < 'a' + SIZE; colLabel++) {
             System.out.print(colLabel + " ");
         }
         System.out.println();
 
-        for (int i = 0; i < size; i++) {
+        for (int i = 0; i < SIZE; i++) {
             System.out.print((i + 1) + " ");  // Print row number
-            for (int j = 0; j < size; j++) {
+            for (int j = 0; j < SIZE; j++) {
                 System.out.print(board[i][j] + " ");  // Print cell value
             }
             System.out.println();
         }
     }
 
-    // Places a move on the board if the position is valid and empty
-    public boolean makeMove(String position, char sym) {
-        int col = position.charAt(0) - 'a';  // Convert letter to column index
-        int row = Character.getNumericValue(position.charAt(1)) - 1;  // Convert number to row index
-
-        if (row >= 0 && row < size && col >= 0 && col < size && board[row][col] == '.') {
-            board[row][col] = sym;
-            return true;
-        }
-        return false;
+    // Makes move in board
+    public void makeMove(Pawn pawn) {
+        board[pawn.getMove().row][pawn.getMove().col] = pawn.getSymbol();
+    }
+    
+    // Undo a move in the board.
+    public void undoMove(Pawn pawn) {
+        board[pawn.getMove().row][pawn.getMove().col] = '.';
     }
 
-    // Reverts a move by clearing the given position
-    public void unmakeMove(String position) {
-        int col = position.charAt(0) - 'a';
-        int row = Character.getNumericValue(position.charAt(1)) - 1;
-
-        if (row >= 0 && row < size && col >= 0 && col < size) {
-            board[row][col] = '.'; 
-        }
-    }
-
-    // Checks if the given player has won the game
-    public boolean checkWin(char sym) {
-        for (int i = 0; i < size; i++) {
-            for (int j = 0; j < size; j++) {
-                if (checkDirection(i, j, sym, 1, 0) ||  // vertical
-                    checkDirection(i, j, sym, 0, 1) ||  // horizontal
-                    checkDirection(i, j, sym, 1, 1) ||  // diagonal \
-                    checkDirection(i, j, sym, 1, -1)) { // diagonal /
+    // Checks if someone won.
+    public boolean checkWin(char symbol) {
+        // Check rows, columns, and diagonals for five in a row
+        for (int i = 0; i < SIZE; i++) {
+            for (int j = 0; j < SIZE; j++) {
+                if (checkDirection(i, j, symbol, 1, 0) ||  // Horizontal
+                    checkDirection(i, j, symbol, 0, 1) ||  // Vertical
+                    checkDirection(i, j, symbol, 1, 1) ||  // Diagonal \
+                    checkDirection(i, j, symbol, 1, -1)) { // Diagonal /
                     return true;
                 }
             }
@@ -78,14 +71,14 @@ public class Board {
         return false;
     }
 
-    // Helper method to check for 5 in a row in a specific direction
-    private boolean checkDirection(int row, int col, char sym, int dRow, int dCol) {
+    // Function used to cound amount of the same symbol in the board. (Max 5)
+    private boolean checkDirection(int row, int col, char symbol, int dRow, int dCol) {
         int count = 0;
         for (int k = 0; k < 5; k++) { 
             int newRow = row + k * dRow;
             int newCol = col + k * dCol;
 
-            if (newRow >= 0 && newRow < size && newCol >= 0 && newCol < size && board[newRow][newCol] == sym) {
+            if (newRow >= 0 && newRow < SIZE && newCol >= 0 && newCol < SIZE && board[newRow][newCol] == symbol) {
                 count++;
             } else {
                 break;
@@ -94,13 +87,51 @@ public class Board {
         return count == 5;
     }
 
+    public List<Move> getAvailableMoves() {
+            List<Move> moves = new ArrayList<>();
+            for (int i = 0; i < SIZE; i++) {
+                for (int j = 0; j < SIZE; j++) {
+                    if (board[i][j] == '.')
+                        moves.add(new Move(i, j));
+                }
+            }
+            return moves;
+    }
+
+    //  Checks if someone won or if there is a draw
+    public boolean isGameOver() {
+        return checkWin('X') || checkWin('O') || getAvailableMoves().isEmpty();
+    }
+
+
+
     // Checks if the board is full (i.e., a draw)
     public boolean isDraw() {
-        for (int i = 0; i < size; i++) {
-            for (int j = 0; j < size; j++) {
+        for (int i = 0; i < SIZE; i++) {
+            for (int j = 0; j < SIZE; j++) {
                 if (board[i][j] == '.') return false;  // Empty spot found, not a draw
             }
         }
         return true; 
     }
+
+    // Checks if a specific cell is empty
+    public boolean isCellEmpty(String cell) {
+        if (cell == null || cell.length() != 2) return false;
+    
+        char colChar = Character.toLowerCase(cell.charAt(0));
+        int col = colChar - 'a';
+    
+        char rowChar = cell.charAt(1);
+        if (!Character.isDigit(rowChar)) return false;
+    
+        int row = Character.getNumericValue(rowChar) - 1;
+    
+        if (row >= 0 && row < board.length && col >= 0 && col < board[0].length) {
+            return board[row][col] == '.';
+        }
+    
+        return false;
+    }
+
 }
