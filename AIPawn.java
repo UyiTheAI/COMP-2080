@@ -1,9 +1,33 @@
+/*
+First Name: Sara
+Last Name: Mosquera
+Student ID: 101512887
+
+
+First Name: Luna
+Last Name: Ortega
+Student ID: 101477171
+
+First Name: Andre
+Last Name: Alvares
+Student ID: 101512582
+
+First Name: Judene
+Last Name: Brown
+Student ID: 101503637
+
+First Name: Omoruyi
+Last Name: Oredia
+Student ID: 101496942
+
+*/
 public class AIPawn extends Pawn {
     
     public AIPawn(char symbol) {
         super("AI",symbol);
     }
 
+    // Gets the best move of all the possible moves based on the score.
     public Move getBestMove(Board board, PlayerPawn playerPawn) {
         int bestValue = Integer.MIN_VALUE;
         Move bestMove = null;
@@ -23,6 +47,7 @@ public class AIPawn extends Pawn {
         return bestMove;
     }
 
+    // Evaluates different boards and possible outcomes
     private int minimax(Board board, int depth, boolean isMaximizing, int alpha, int beta, char aiSymbol, char playerSymbol) {
         if (depth == 0 || board.isGameOver()) {
             return evaluateBoard(board, aiSymbol, playerSymbol);
@@ -54,12 +79,14 @@ public class AIPawn extends Pawn {
         }
     }
 
-    
+    //  Evaluates the total score of the AI of the final board 
     private int evaluateBoard(Board board, char aiSymbol, char playerSymbol) {
         int aiScore = evaluateSymbol(board, aiSymbol);
         int playerScore = evaluateSymbol(board, playerSymbol);
         return aiScore - playerScore;
     }
+
+    // Evaluates the score of a specific symbol in the final board
     private int evaluateSymbol(Board board, char symbol) { 
         int score = 0;
     

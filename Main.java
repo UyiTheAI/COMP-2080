@@ -20,7 +20,7 @@ First Name: Omoruyi
 Last Name: Oredia
 Student ID: 101496942
 
- */
+*/
 
 import java.util.Scanner;
 
@@ -31,9 +31,9 @@ public class Main {
         Scanner scanner = new Scanner(System.in);
 
         Board board = new Board();
-
+        System.out.println("===============================");
         System.out.println("Welcome to Gomoku!");
-
+        System.out.println("===============================");
         System.out.println("Choose game mode: \n1) Single Player (vs AI)\n2) Two Players");
 
         int mode = scanner.nextInt();
@@ -74,7 +74,9 @@ public class Main {
             clearScreen();
             board.displayBoard();
             Pawn currentPlayer = isPlayerTurn ? player : aiPlayer; // Defines who goes first
+            System.out.println("===============================");
             System.out.println(currentPlayer.getName() + "'s turn (" + currentPlayer.getSymbol() + ")");
+            System.out.println("===============================");
 
             if (isPlayerTurn) {
                 System.out.println("For making a move you need to use letters and numbers.");
@@ -139,7 +141,9 @@ public class Main {
             clearScreen();
             board.displayBoard();
             PlayerPawn currentPlayer = isPlayer1Turn ? player1 : player2;
+            System.out.println("===============================");
             System.out.println(currentPlayer.getName() + "'s turn (" + currentPlayer.getSymbol() + ")");
+            System.out.println("===============================");
             System.out.println("For making a move you need to use letters and numbers.");
             System.out.println("From A-I for columns, and from 1-9 for rows.");
             System.out.print("Enter your move (e.g., 'e5'): ");
