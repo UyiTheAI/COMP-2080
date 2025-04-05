@@ -1,133 +1,68 @@
-import java.util.Scanner;
-
-public class Gomoku {
-
-    public static void main(String[] args) {
-
-        Scanner scanner = new Scanner(System.in);
-
-        Board board = new Board();
-
-        System.out.println("Welcome to Gomoku!");
-
-        System.out.println("Choose game mode: \n1) Single Player (vs AI)\n2) Two Players");
-
-        int mode = scanner.nextInt();
-
-        scanner.nextLine(); 
-
-        if (mode == 1) {
-            singlePlayerMode(scanner, board);
-        } else if (mode == 2) {
-            twoPlayerMode(scanner, board);
-        } else {
-            System.out.println("Invalid choice!");
-        }
-    }
-
-    private static void singlePlayerMode(Scanner scanner, Board board) {
-        System.out.print("Enter your name: ");
-        String playerName = scanner.nextLine();
-        System.out.print("Choose your symbol ('B' for Black or 'W' for White): ");
-        char playerSymbol = scanner.nextLine().toUpperCase().charAt(0);
-
-        if (playerSymbol != 'B' && playerSymbol != 'W') {
-            System.out.println("Invalid symbol. Defaulting to 'B'.");
-            playerSymbol = 'B';
-        }
-
-        char aiSymbol = (playerSymbol == 'B') ? 'W' : 'B';
-        Pawn player = new Pawn(playerName, playerSymbol);
-        Pawn aiPlayer = new Pawn("AI", aiSymbol);
-        boolean isPlayerTurn = playerSymbol == 'B'; // Black goes first
-
-        while (true) {
-            board.displayBoard();
-            Pawn currentPlayer = isPlayerTurn ? player : aiPlayer;
-            System.out.println(currentPlayer.getName() + "'s turn (" + currentPlayer.getSymbol() + ")");
-
-            if (isPlayerTurn) {
-                System.out.print("Enter your move (e.g., 'e5'): ");
-                String move = scanner.nextLine();
-                if (!board.makeMove(move, player.getSymbol())) {
-                    System.out.println("Invalid move. Try again.");
-                    continue;
-                }
-            } else {
-                System.out.println("AI is thinking...");
-                String aiMove = minimax(board, aiSymbol, playerSymbol, 3);
-                if (!board.makeMove(aiMove, aiSymbol)) {
-                    System.out.println("AI failed to make a valid move. This should not happen.");
-                    break; 
-                }
-                System.out.println("AI played " + aiMove);
-            }
-
-            if (board.checkWin(player.getSymbol())) {
-                board.displayBoard();
-                System.out.println(player.getName() + " wins!");
-                break;
-            } else if (board.checkWin(aiSymbol)) {
-                board.displayBoard();
-                System.out.println("AI wins!");
-                break;
-            } else if (board.isDraw()) {
-                board.displayBoard();
-                System.out.println("It's a draw!");
-                break;
-            }
-
-            isPlayerTurn = !isPlayerTurn;
-        }
-    }
-
-    private static void twoPlayerMode(Scanner scanner, Board board) {
-        System.out.print("Enter Player 1 name: ");
-        String player1Name = scanner.nextLine();
-        System.out.print("Choose Player 1 symbol ('B' for Black or 'W' for White): ");
-        char player1Symbol = scanner.nextLine().toUpperCase().charAt(0);
-        if (player1Symbol != 'B' && player1Symbol != 'W') {
-            System.out.println("Invalid symbol. Defaulting to 'B'.");
-            player1Symbol = 'B';
-        }
-
-        System.out.print("Enter Player 2 name: ");
-        String player2Name = scanner.nextLine();
-        char player2Symbol = (player1Symbol == 'B') ? 'W' : 'B';
-        Pawn player1 = new Pawn(player1Name, player1Symbol);
-        Pawn player2 = new Pawn(player2Name, player2Symbol);
-        boolean isPlayer1Turn = true;
-
-        while (true) {
-            board.displayBoard();
-            Pawn currentPlayer = isPlayer1Turn ? player1 : player2;
-            System.out.println(currentPlayer.getName() + "'s turn (" + currentPlayer.getSymbol() + ")");
-            System.out.print("Enter your move (e.g., 'e5'): ");
-            String move = scanner.nextLine();
-            if (!board.makeMove(move, currentPlayer.getSymbol())) {
-                System.out.println("Invalid move. Try again.");
-                continue;
-            }
-
-            if (board.checkWin(player1.getSymbol())) {
-                board.displayBoard();
-                System.out.println(player1.getName() + " wins!");
-                break;
-            } else if (board.checkWin(player2.getSymbol())) {
-                board.displayBoard();
-                System.out.println(player2.getName() + " wins!");
-                break;
-            } else if (board.isDraw()) {
-                board.displayBoard();
-                System.out.println("It's a draw!");
-                break;
-            }
-
-            isPlayer1Turn = !isPlayer1Turn;
-        }
-    }
+public class AIPawn extends Pawn {
     
-    private static String minimax(Board board, char aiSymbol, char playerSymbol, int depth) {
+    private char symbol;
+    private Move move;
+    private String name;
+
+    public AIPawn(char symbol) {
+        super(symbol);
+    }
+
+    public Move getBestMove(Board board, PlayerPawn playerPawn) {
+        int bestValue = Integer.MIN_VALUE;
+        Move bestMove = null;
+        // Loop through all available moves, applying minimax at a depth of 3.
+        for (Move moveI : board.getAvailableMoves()) {
+            this.move = new Move(moveI.row, moveI.col);
+            board.makeMove(this);
+            int moveValue = minimax(board, 3, false, Integer.MIN_VALUE, Integer.MAX_VALUE, playerPawn);
+            board.undoMove(this);
+            if (moveValue > bestValue) {
+                bestValue = moveValue;
+                bestMove = moveI;
+            }
+        }
+        return bestMove;
+    }
+
+    private int minimax(Board board, int depth, boolean isMaximizing, int alpha, int beta, PlayerPawn playerPawn) {
+        if (depth == 0 || board.isGameOver()) {
+            return evaluateBoard(board, this.symbol, playerPawn.getSymbol());
+        }
+        if (isMaximizing) {
+            int maxEval = Integer.MIN_VALUE;
+            for (Move moveI : board.getAvailableMoves()) {
+                this.move = new Move(moveI.row, moveI.col);
+
+                board.makeMove(this);
+                int eval = minimax(board, depth - 1, false, alpha, beta, playerPawn);
+                board.undoMove(this);
+
+                maxEval = Math.max(maxEval, eval);
+                alpha = Math.max(alpha, eval);
+
+                if (beta <= alpha) break;  // Beta cut-off
+            }
+            return maxEval;
+        } else {
+            int minEval = Integer.MAX_VALUE;
+            for (Move moveI : board.getAvailableMoves()) {
+                playerPawn.move = new Move(moveI.row, moveI.col);
+
+                board.makeMove(playerPawn);
+                int eval = minimax(board, depth - 1, true, alpha, beta, playerPawn);
+                board.undoMove(playerPawn);
+
+                minEval = Math.min(minEval, eval);
+                beta = Math.min(beta, eval);
+
+                if (beta <= alpha) break;  // Alpha cut-off
+            }
+            return minEval;
+        }
+    }
+
+    /*private String minimax(Board board, char aiSymbol, char playerSymbol, int depth) {
         int bestScore = Integer.MIN_VALUE;
         String bestMove = null;
     
@@ -149,7 +84,7 @@ public class Gomoku {
         return bestMove;
     }
     
-    private static int minimaxRecursive(Board board, int depth, boolean isMaximizing, char aiSymbol, char playerSymbol, int alpha, int beta) {
+    private int minimaxRecursive(Board board, int depth, boolean isMaximizing, char aiSymbol, char playerSymbol, int alpha, int beta) {
         if (board.checkWin(aiSymbol)) return 10;
         if (board.checkWin(playerSymbol)) return -10;
         if (board.isDraw() || depth == 0) return evaluateBoard(board, aiSymbol, playerSymbol);
@@ -188,14 +123,14 @@ public class Gomoku {
             return minEval;
         }
     }
+    */
     
-    
-    private static int evaluateBoard(Board board, char aiSymbol, char playerSymbol) {
+    private int evaluateBoard(Board board, char aiSymbol, char playerSymbol) {
         int aiScore = evaluateSymbol(board, aiSymbol);
         int playerScore = evaluateSymbol(board, playerSymbol);
         return aiScore - playerScore;
     }
-    private static int evaluateSymbol(Board board, char symbol) {
+    private int evaluateSymbol(Board board, char symbol) { 
         int score = 0;
     
         int[][] directions = {
@@ -263,5 +198,8 @@ public class Gomoku {
     
         return score;
     }
-        
+    
+    public String getName(){ return name;}
+    public char getSymbol() { return symbol;}
+    public Move getMove(){ return move;}
 }

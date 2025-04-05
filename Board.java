@@ -1,3 +1,6 @@
+import java.util.ArrayList;
+import java.util.List;
+
 public class Board {
 
     static final int SIZE = 9;
@@ -17,7 +20,6 @@ public class Board {
         }
     }
 
-
     public void displayBoard() {
         // Print column labels
         System.out.print("  ");
@@ -36,25 +38,12 @@ public class Board {
         }
     }
 
-    public boolean makeMove(String position, char symbol) {
-        // Parse position (e.g., "e5")
-        int col = position.charAt(0) - 'a'; // Convert column letter to index
-        int row = Character.getNumericValue(position.charAt(1)) - 1; // Convert row number to index
-
-        if (row >= 0 && row < SIZE && col >= 0 && col < SIZE && board[row][col] == '.') {
-            board[row][col] = symbol;
-            return true;
-        }
-        return false;
+    public void makeMove(Pawn pawn) {
+        board[pawn.getMove().row][pawn.getMove().col] = pawn.getSymbol();
     }
     
-    public void undoMove(String position) {
-        int col = position.charAt(0) - 'a';
-        int row = Character.getNumericValue(position.charAt(1)) - 1;
-
-        if (row >= 0 && row < SIZE && col >= 0 && col < SIZE) {
-            board[row][col] = '.'; // Reset the position to empty
-        }
+    public void undoMove(Pawn pawn) {
+        board[pawn.getMove().row][pawn.getMove().col] = '.';
     }
 
     public boolean checkWin(char symbol) {
@@ -87,6 +76,21 @@ public class Board {
         return count == 5;
     }
 
+    public boolean isGameOver() {
+        return checkWin('X') || checkWin('O') || getAvailableMoves().isEmpty();
+    }
+
+    public List<Move> getAvailableMoves() {
+            List<Move> moves = new ArrayList<>();
+            for (int i = 0; i < SIZE; i++) {
+                for (int j = 0; j < SIZE; j++) {
+                    if (board[i][j] == '.')
+                        moves.add(new Move(i, j));
+                }
+            }
+            return moves;
+    }
+
     public boolean isDraw() {
         for (int i = 0; i < SIZE; i++) {
             for (int j = 0; j < SIZE; j++) {
@@ -94,6 +98,15 @@ public class Board {
             }
         }
         return true; // No empty spots, it's a draw
+    }
+
+    public boolean isCellEmpty(String cell){
+        int col = cell.charAt(0) - 'a';
+        int row = Character.getNumericValue(cell.charAt(1)) - 1;
+
+        if (board[row][col] == '.') return true;
+
+        return false;
     }
 
 }
