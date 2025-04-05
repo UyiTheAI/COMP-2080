@@ -24,7 +24,7 @@ Student ID: 101496942
 
 import java.util.Scanner;
 
-public class Gomoku {
+public class Main {
 
     public static void main(String[] args) {
 
@@ -71,7 +71,7 @@ public class Gomoku {
         boolean isPlayerTurn = playerSymbol == 'X'; // Black goes first
 
         while (true) {
-
+            clearScreen();
             board.displayBoard();
             Pawn currentPlayer = isPlayerTurn ? player : aiPlayer; // Defines who goes first
             System.out.println(currentPlayer.getName() + "'s turn (" + currentPlayer.getSymbol() + ")");
