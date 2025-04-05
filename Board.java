@@ -1,41 +1,24 @@
 /*
-First Name: Sara
-Last Name: Mosquera
-Student ID: 101512887
-
-
-First Name: Luna
-Last Name: Ortega
-Student ID: 101477171
-
-First Name: Andre
-Last Name: Alvares
-Student ID: 101512582
-
-First Name: Judene
-Last Name: Brown
-Student ID: 101503637
-
-First Name: Omoruyi
-Last Name: Oredia
-Student ID: 101496942
-
-*/
+ * Sara Mosquera - 101512887
+ * Luna Ortega - 101477171
+ * Andre Alvares- 101512582
+ * Judene Brown - 101503637
+ * Omoruyi Oredia - 101496942
+ */
 import java.util.ArrayList;
 import java.util.List;
-
 public class Board {
 
     public static final int SIZE = 9;
     public char[][] board;
 
-
+    // Constructor initializes the board
     public Board() {
         board = new char[SIZE][SIZE];
         initializeBoard();
     }
 
-    // Fills the board
+    // Fill the board with '.' to indicate empty cells
     public void initializeBoard() {
         for (int i = 0; i < SIZE; i++) {
             for (int j = 0; j < SIZE; j++) {
@@ -44,19 +27,19 @@ public class Board {
         }
     }
 
+    // Displays the board with row numbers and column letters
+
     public void displayBoard() {
-        // Print column labels
         System.out.print("  ");
         for (char colLabel = 'a'; colLabel < 'a' + SIZE; colLabel++) {
             System.out.print(colLabel + " ");
         }
         System.out.println();
 
-        // Print rows with labels
         for (int i = 0; i < SIZE; i++) {
-            System.out.print((i + 1) + " "); // Row label
+            System.out.print((i + 1) + " ");  // Print row number
             for (int j = 0; j < SIZE; j++) {
-                System.out.print(board[i][j] + " ");
+                System.out.print(board[i][j] + " ");  // Print cell value
             }
             System.out.println();
         }
@@ -91,22 +74,17 @@ public class Board {
     // Function used to cound amount of the same symbol in the board. (Max 5)
     private boolean checkDirection(int row, int col, char symbol, int dRow, int dCol) {
         int count = 0;
-        for (int k = 0; k < 5; k++) { // Check for five consecutive symbols
+        for (int k = 0; k < 5; k++) { 
             int newRow = row + k * dRow;
             int newCol = col + k * dCol;
 
-            if (newRow >= 0 && newRow < SIZE && newCol >= 0 && newCol < SIZE && board[newRow][newCol] == symbol) {
+            if (newRow >= 0 && newRow < SIZE && newCol >= 0 && newCol < SIZE && board[newRow][newCol] == sym) {
                 count++;
             } else {
                 break;
             }
         }
         return count == 5;
-    }
-
-    //  Checks if someone won or if there is a draw
-    public boolean isGameOver() {
-        return checkWin('X') || checkWin('O') || getAvailableMoves().isEmpty();
     }
 
     public List<Move> getAvailableMoves() {
@@ -120,13 +98,21 @@ public class Board {
             return moves;
     }
 
+    //  Checks if someone won or if there is a draw
+    public boolean isGameOver() {
+        return checkWin('X') || checkWin('O') || getAvailableMoves().isEmpty();
+    }
+
+
+
+    // Checks if the board is full (i.e., a draw)
     public boolean isDraw() {
         for (int i = 0; i < SIZE; i++) {
             for (int j = 0; j < SIZE; j++) {
-                if (board[i][j] == '.') return false; // If there's an empty spot, it's not a draw
+                if (board[i][j] == '.') return false;  // Empty spot found, not a draw
             }
         }
-        return true; // No empty spots, it's a draw
+        return true; 
     }
 
     // Checks if a specific cell is empty
