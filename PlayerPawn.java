@@ -1,22 +1,25 @@
 public class PlayerPawn extends Pawn{
-    private String name;
-    private char symbol;
-    public Move move;
 
     public PlayerPawn(String name, char symbol) {
-        super(symbol);
-        this.name = name;
+        super(name, symbol);
     }
 
     public boolean setMovePosition(String movePlayer, int sizeBoard, boolean isBoardEmpty){
-        int col = movePlayer.charAt(0) - 'a'; // Convert column letter to index
-        int row = Character.getNumericValue(movePlayer.charAt(1)) - 1; // Convert row number to index
-        
-        if ((row >= 0 && row < sizeBoard) && (col >= 0) && (col < sizeBoard) && isBoardEmpty) {
-            move = new Move(row, col);
-            return true;
-        }
-        return false;
+        if (movePlayer == null || movePlayer.length() != 2) return false;
+        char colChar = Character.toLowerCase(movePlayer.charAt(0));
+    int col = colChar - 'a';
+
+    char rowChar = movePlayer.charAt(1);
+    if (!Character.isDigit(rowChar)) return false;
+
+    int row = Character.getNumericValue(rowChar) - 1;
+
+    if ((row >= 0 && row < sizeBoard) && (col >= 0 && col < sizeBoard) && isBoardEmpty) {
+        move = new Move(row, col); // Assuming 'move' is a class-level variable
+        return true;
+    }
+
+    return false;
     }
 
     public String getName(){ return name;}

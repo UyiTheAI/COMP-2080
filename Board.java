@@ -3,7 +3,7 @@ import java.util.List;
 
 public class Board {
 
-    static final int SIZE = 9;
+    public static final int SIZE = 9;
     public char[][] board;
 
 
@@ -100,12 +100,21 @@ public class Board {
         return true; // No empty spots, it's a draw
     }
 
-    public boolean isCellEmpty(String cell){
-        int col = cell.charAt(0) - 'a';
-        int row = Character.getNumericValue(cell.charAt(1)) - 1;
-
-        if (board[row][col] == '.') return true;
-
+    public boolean isCellEmpty(String cell) {
+        if (cell == null || cell.length() != 2) return false;
+    
+        char colChar = Character.toLowerCase(cell.charAt(0));
+        int col = colChar - 'a';
+    
+        char rowChar = cell.charAt(1);
+        if (!Character.isDigit(rowChar)) return false;
+    
+        int row = Character.getNumericValue(rowChar) - 1;
+    
+        if (row >= 0 && row < board.length && col >= 0 && col < board[0].length) {
+            return board[row][col] == '.';
+        }
+    
         return false;
     }
 

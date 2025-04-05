@@ -3,8 +3,9 @@ abstract public class Pawn {
     protected char symbol;
     protected Move move;
 
-    public Pawn(char symbol) {
+    public Pawn(String name,char symbol) {
         this.symbol = symbol;
+        this.name = name;
     }
 
     public String getName(){ return name;}

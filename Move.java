@@ -6,4 +6,10 @@ public class Move {
         this.row =  row;
         this.col = col;
     }
+
+    @Override public String toString(){
+        char colChar = (char) ('a' + col); // Convert column number to letter
+        int rowNumber = row + 1;
+        return "" + colChar + rowNumber;
+    }
 }
